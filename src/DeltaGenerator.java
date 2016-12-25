@@ -42,7 +42,6 @@ public class DeltaGenerator {
 					length = commonLength;
 					index1 = i;
 					index2 = j;
-					
 				}
 			}
 		}
