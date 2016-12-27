@@ -5,8 +5,10 @@ public class DeltaGenerator {
 	private static int count = 0;
 	
 	public static void main(String args[]) {
-		byte[] a1 = {'a','b','c', 'd', 'e', 'd', 'a', 'a', 'd', 'a', 'a'};
-		byte[] a2 = {'a','d','b','c', 'd', 'a', 'a', 'd', 'a', 'a'};
+		String first = "abababab";
+		String second = "babababa";
+		byte[] a1 = first.getBytes();
+		byte[] a2 = second.getBytes();
 		generateDelta(a1,a2);
 		
 	}
@@ -47,7 +49,6 @@ public class DeltaGenerator {
 		}
 		
 		if (length >= minSubstringSize) {
-			System.out.println("found LCS at " + index1 + " with length " + length);
 			return new int[] {length, index1, index2};
 		} else {
 			return null;
@@ -88,35 +89,22 @@ public class DeltaGenerator {
 		// value from stringLengths is length of common string
 		// value from editIndexes is the index in the edited data
 		
-		/*
-		 * int counter = 0;
+		int counter = 0;
+		int prevI = 0;
+		int prevJ = 0;
+		int prevLength = 0;
 		for (int i : stringLengths.keySet()) {
-			System.out.print("index a " + i + "|");
-			System.out.print("length " + stringLengths.get(i) + "|");
-			System.out.println("index b " + editIndexes.get(i));
+			int j = editIndexes.get(i);
 			
-			// common string starts at current place
+			if (i > j) System.out.println("Delete " + (i - prevI - prevLength));
+			if (i < j) System.out.println("Write " + (j - prevJ - prevLength));
+			System.out.println("Copy " + stringLengths.get(i));
 			
-			int diff = i - editIndexes.get(i);
-			if (diff == 0) {
-				// Common strings have the same indexes
-				// Copy operation
-				System.out.println("Copy " + stringLengths.get(i));
-			} else if (diff > 0){
-				// common string is later in the original string
-				// Remove then copy
-				System.out.println("Remove " + diff);
-				System.out.println("Copy " + stringLengths.get(i));
-			} else {
-				// Common string is earlier in the original string
-				// Write then copy
-				System.out.print("Write ");
-				for (int j = diff; j < 0; j++) {
-					System.out.print(Character.toChars(a2[i-j]));
-				}
-				System.out.println();
-			}
+			prevI = i;
+			prevJ = j;
+			prevLength = stringLengths.get(i);
 		}
-		*/
+		
+		
 	}
 }
