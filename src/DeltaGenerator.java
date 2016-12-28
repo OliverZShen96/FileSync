@@ -5,12 +5,11 @@ public class DeltaGenerator {
 	private static int count = 0;
 	
 	public static void main(String args[]) {
-		String first = "abababab";
-		String second = "babababa";
+		String first = "abddcdefdaadaaf";
+		String second = "addsbcdaadaag";
 		byte[] a1 = first.getBytes();
 		byte[] a2 = second.getBytes();
 		generateDelta(a1,a2);
-		
 	}
 
 	// Find the longest common substring between two byte arrays
@@ -97,7 +96,7 @@ public class DeltaGenerator {
 			int j = editIndexes.get(i);
 			
 			if (i > j) System.out.println("Delete " + (i - prevI - prevLength));
-			if (i < j) System.out.println("Write " + (j - prevJ - prevLength));
+			if (i < j) write(j-prevJ-prevLength, prevJ+prevLength, a2);
 			System.out.println("Copy " + stringLengths.get(i));
 			
 			prevI = i;
@@ -105,6 +104,18 @@ public class DeltaGenerator {
 			prevLength = stringLengths.get(i);
 		}
 		
-		
+		int lastI = prevI + prevLength;
+		int lastJ = prevJ + prevLength;
+		System.out.println("Delete " + (a1.length - lastI));
+		write(a2.length-lastJ, lastJ, a2);
+	}
+	
+	// writes out n bytes starting from the specified index of the data
+	private static void write(int n, int index, byte[] data) {
+		System.out.print("Write ");
+		for (int i = 0; i < n; i++) {
+			System.out.print(Character.toChars(data[index+i]));
+		}
+		System.out.println();
 	}
 }
