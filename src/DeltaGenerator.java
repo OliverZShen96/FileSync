@@ -1,15 +1,20 @@
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
 import java.util.Arrays;
 import java.util.TreeMap;
 
 public class DeltaGenerator {
-	private static int count = 0;
+	public static FileWriter w;
 	
-	public static void main(String args[]) {
-		String first = "abddcdefdaadaaf";
-		String second = "addsbcdaadaag";
+	public static void main(String args[]) throws IOException {
+		w = new FileWriter("fileDelta.txt");
+		String first = "aabcdef";
+		String second = "aabbcdeg";
 		byte[] a1 = first.getBytes();
 		byte[] a2 = second.getBytes();
 		generateDelta(a1,a2);
+		w.close();
 	}
 
 	// Find the longest common substring between two byte arrays
@@ -68,7 +73,6 @@ public class DeltaGenerator {
 		// the values are the length of the strings, and the indexes of the strings in the edited array
 		stringLengths.put(LCS[1], LCS[0]);
 		editIndexes.put(LCS[1], LCS[2]);
-		count++;
 		
 		// search regions before and after
 		findCommonSubstrings(original, edited, stringLengths, editIndexes, startOriginal, LCS[1]-1, startEdited, LCS[2]-1, minSubstringSize);
@@ -76,11 +80,11 @@ public class DeltaGenerator {
 	}
 	
 	// Given a file and an edit of it, create a file that can be used in conjunction with the original to recreate the edit
-	public static void generateDelta(byte[] a1, byte[] a2) {
+	public static void generateDelta(byte[] a1, byte[] a2) throws IOException {
 		TreeMap<Integer, Integer> stringLengths = new TreeMap<Integer, Integer>();
 		TreeMap<Integer, Integer> editIndexes = new TreeMap<Integer, Integer>();
 		
-		findCommonSubstrings(a1,a2, stringLengths, editIndexes, 0, a1.length-1, 0, a2.length-1, 1);
+		findCommonSubstrings(a1,a2, stringLengths, editIndexes, 0, a1.length-1, 0, a2.length-1, 3);
 		
 		// iterate through indexes of common strings
 		
@@ -92,12 +96,13 @@ public class DeltaGenerator {
 		int prevI = 0;
 		int prevJ = 0;
 		int prevLength = 0;
+	
 		for (int i : stringLengths.keySet()) {
 			int j = editIndexes.get(i);
 			
-			if (i > j) System.out.println("Delete " + (i - prevI - prevLength));
-			if (i < j) write(j-prevJ-prevLength, prevJ+prevLength, a2);
-			System.out.println("Copy " + stringLengths.get(i));
+			if (i - prevI - prevLength > 0) w.write("D" + (i - prevI - prevLength));
+			if (j-prevJ-prevLength > 0) write(j-prevJ-prevLength, prevJ+prevLength, a2);
+			w.write("C" + stringLengths.get(i));
 			
 			prevI = i;
 			prevJ = j;
@@ -106,16 +111,15 @@ public class DeltaGenerator {
 		
 		int lastI = prevI + prevLength;
 		int lastJ = prevJ + prevLength;
-		System.out.println("Delete " + (a1.length - lastI));
-		write(a2.length-lastJ, lastJ, a2);
+		if (a1.length - lastI > 0) w.write("D" + (a1.length - lastI));
+		if (a2.length-lastJ > 0) write(a2.length-lastJ, lastJ, a2);
 	}
 	
 	// writes out n bytes starting from the specified index of the data
-	private static void write(int n, int index, byte[] data) {
-		System.out.print("Write ");
+	private static void write(int n, int index, byte[] data) throws IOException {
+		w.write("W" + n);
 		for (int i = 0; i < n; i++) {
-			System.out.print(Character.toChars(data[index+i]));
+			w.write(Character.toChars(data[index+i]));
 		}
-		System.out.println();
 	}
 }
