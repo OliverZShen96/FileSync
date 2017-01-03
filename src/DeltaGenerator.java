@@ -102,9 +102,9 @@ public class DeltaGenerator {
 		for (int i : stringLengths.keySet()) {
 			int j = editIndexes.get(i);
 			
-			if (i - prevI - prevLength > 0) w.write("D" + (i - prevI - prevLength));
+			if (i - prevI - prevLength > 0) w.write("D" + (i - prevI - prevLength) + "D");
 			if (j-prevJ-prevLength > 0) write(j-prevJ-prevLength, prevJ+prevLength, a2, w);
-			w.write("C" + stringLengths.get(i));
+			w.write("C" + stringLengths.get(i) + "C");
 			
 			prevI = i;
 			prevJ = j;
@@ -113,14 +113,14 @@ public class DeltaGenerator {
 		
 		int lastI = prevI + prevLength;
 		int lastJ = prevJ + prevLength;
-		if (a1.length - lastI > 0) w.write("D" + (a1.length - lastI));
+		if (a1.length - lastI > 0) w.write("D" + (a1.length - lastI) + "D");
 		if (a2.length-lastJ > 0) write(a2.length-lastJ, lastJ, a2, w);
 		w.close();
 	}
 	
 	// writes out n bytes starting from the specified index of the data
 	private static void write(int n, int index, byte[] data, FileWriter w) throws IOException {
-		w.write("W" + n);
+		w.write("W" + n + "W");
 		for (int i = 0; i < n; i++) {
 			w.write(Character.toChars(data[index+i]));
 		}
