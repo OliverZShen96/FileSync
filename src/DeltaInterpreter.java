@@ -4,6 +4,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.Arrays;
 
 public class DeltaInterpreter {
 	
@@ -24,26 +25,28 @@ public class DeltaInterpreter {
 		int i = 0;
 		while ((curr = br.read()) != -1) {
 			char c = (char) curr;
+			char type = (char) curr;
+			String num = "";
 			
-			// Delete
-			if (c == 'D' || c == 'W' || c == 'C') {
-				char type = c;
-				String num = "";
-				while (true) {
-					c = (char)br.read();
-					if (c == type) break;
-					num = num + c;
+			// read the command parameter (number between two letters)
+			while (true) {
+				c = (char)br.read();
+				if (c == type) break;
+				num = num + c;
+			}
+			
+			// interpret command: 'W', 'D', or 'C'
+			if (type == 'W') {
+				for (int j = Integer.parseInt(num); j > 0; j--) {
+					c = (char) br.read();
+					w.write(c);
 				}
-				System.out.println("["+num+"]");
-				
-				if (type == 'W') {
-					for (int j = Integer.parseInt(num); j > 0; j--) {
-						c = (char) br.read();
-						w.write(c);
-					}
-				}
-			} else {
-				System.out.println("SOMETHING BAD HAPPENED");
+			} else if (type == 'D') {
+				i+= Integer.parseInt(num);
+			} else if (type == 'C'){
+				String copiedText = new String(Arrays.copyOfRange(a1, i, i+Integer.parseInt(num)));
+				w.write(copiedText);
+				i+= Integer.parseInt(num);
 			}
 		}
 		w.close();
